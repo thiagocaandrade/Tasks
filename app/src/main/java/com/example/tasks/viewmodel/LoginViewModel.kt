@@ -4,7 +4,7 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.example.tasks.service.HeaderModel
+import com.example.tasks.service.model.HeaderModel
 import com.example.tasks.service.constants.TaskConstants
 import com.example.tasks.service.listener.APIListener
 import com.example.tasks.service.listener.ValidationListener
@@ -19,11 +19,14 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
     private val mLogin = MutableLiveData<ValidationListener>()
     var login: LiveData<ValidationListener> = mLogin
 
+    private val mLoggedUser = MutableLiveData<Boolean>()
+    var loggedUser: LiveData<Boolean> = mLoggedUser
+
     /**
      * Faz login usando API
      */
     fun doLogin(email: String, password: String) {
-        mPersonRepository.login(email, password, object : APIListener{
+        mPersonRepository.login(email, password, object : APIListener {
             override fun onSucess(model: HeaderModel) {
 
                 mSharedPreferences.store(TaskConstants.SHARED.TOKEN_KEY, model.token)
@@ -45,6 +48,11 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
      * Verifica se usuário está logado
      */
     fun verifyLoggedUser() {
+        val token = mSharedPreferences.get(TaskConstants.SHARED.TOKEN_KEY)
+        val person = mSharedPreferences.get(TaskConstants.SHARED.PERSON_KEY)
+
+        val logged = (token != "" && person != "")
+        mLoggedUser.value = logged
 
 
     }
